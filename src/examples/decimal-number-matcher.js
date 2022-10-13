@@ -43,8 +43,8 @@ class DecimalNumberMatcher {
 
   match(value) {
     let result = new ValidationResult();
+        if (value == null) { return result; }
 
-    if (value != null) {
       let number;
 
       try {
@@ -59,7 +59,6 @@ class DecimalNumberMatcher {
       if (this.isDecimalPlacesValidationNeeded()) {
         this.validateDecimalPlaces(number, result)
       }
-    }
 
     return result;
   }
