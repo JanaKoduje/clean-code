@@ -17,7 +17,7 @@ const ValidationResult = require("./validation-result");
  *   -- both conditions must be met in this case.
  */
 
-const MAX_NUM_OF_DIGITS = 11;
+const DEFAULT_MAX_NUM_OF_DIGITS = 11;
 const MAX_NUM_OF_DIGITS_INDEX = 0;
 const MAX_NUM_OF_DECIMAL_INDEX = 1;
 
@@ -43,22 +43,23 @@ class DecimalNumberMatcher {
 
   match(value) {
     let result = new ValidationResult();
-        if (value == null) { return result; }
+    if (value == null) {
+      return result;
+    }
 
-      let number;
+    let number;
+    try {
+      number = new Decimal(value);
+    } catch (e) {
+      this.appendError(result, Errors.invalidDecimalError);
+      return result;
+    }
 
-      try {
-        number = new Decimal(value);
-      } catch (e) {
-        this.appendError(result, Errors.invalidDecimalError);
-        return result;
-      }
+    this.validateNumberOfDigits(number, result);
 
-      this.validateNumberOfDigits(number, result);
-
-      if (this.isDecimalPlacesValidationNeeded()) {
-        this.validateDecimalPlaces(number, result)
-      }
+    if (this.isDecimalPlacesValidationNeeded()) {
+      this.validateDecimalPlaces(number, result)
+    }
 
     return result;
   }
@@ -72,7 +73,7 @@ class DecimalNumberMatcher {
   }
 
   validateNumberOfDigits(number, result) {
-    if (number.precision(true) > (this.params[MAX_NUM_OF_DIGITS_INDEX] ?? MAX_NUM_OF_DIGITS)) {
+    if (number.precision(true) > (this.params[MAX_NUM_OF_DIGITS_INDEX] ?? DEFAULT_MAX_NUM_OF_DIGITS)) {
       this.appendError(result, Errors.maxDigitsExceeded);
     }
   }
